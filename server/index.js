@@ -121,7 +121,7 @@ function attachSockets(httpServer) {
         const str = (v) => (typeof v === 'string' ? v : '');
         session = sessions.create(clean, emit);
         owned.add(session.id);
-        await session.connect({ keyPath: clean.keyPath, password: str(p.password), passphrase: str(p.passphrase) });
+        await session.connect({ authMethod: clean.authMethod, keyPath: clean.keyPath, password: str(p.password), passphrase: str(p.passphrase) });
         await session.openShell({
           cols: Math.max(2, Number(p.cols) || 80),
           rows: Math.max(2, Number(p.rows) || 24),

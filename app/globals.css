@@ -7,14 +7,14 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 14px/1.4 system-ui, sans-serif; }
 code { font-family: ui-monospace, Menlo, Consolas, monospace; }
-button, input, textarea { font: inherit; color: inherit; }
+button, input, textarea, select { font: inherit; color: inherit; }
 button { background: var(--panel2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 10px; cursor: pointer; }
 button:hover:not(:disabled) { border-color: var(--accent); }
 button:disabled { opacity: .45; cursor: not-allowed; }
 button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
 button.danger:hover:not(:disabled) { border-color: var(--danger); color: var(--danger); }
-input, textarea { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; }
-input:focus, textarea:focus { outline: 1px solid var(--accent); }
+input, textarea, select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; width: 100%; }
+input:focus, textarea:focus, select:focus { outline: 1px solid var(--accent); }
 label { display: flex; flex-direction: column; gap: 3px; font-size: 12px; color: var(--muted); }
 .muted { color: var(--muted); } .small { font-size: 12px; }
 .error { background: #3d1418; border: 1px solid var(--danger); color: #ffb3ae; padding: 6px 10px; border-radius: 6px; margin: 6px 0; }

@@ -30,10 +30,16 @@ export default function SessionView({ params, active, onEnded }) {
 
   const connect = useCallback(
     async (extra = {}) => {
+      const merged = { ...params, ...extra };
+      if (merged.authMethod === 'password' && !merged.password) {
+        setStatus('auth');
+        setMessage('Password required');
+        return;
+      }
       setStatus('connecting');
       setMessage('');
       const { cols, rows } = termRef.current.size();
-      getSocket().emit('ssh:connect', { ...params, ...extra, cols, rows }, (res) => {
+      getSocket().emit('ssh:connect', { ...merged, cols, rows }, (res) => {
         if (res.ok) {
           sidRef.current = res.sid;
           setSid(res.sid);
@@ -151,11 +157,11 @@ export default function SessionView({ params, active, onEnded }) {
                   className="stack"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    connect({ password });
+                    connect({ authMethod: 'password', password });
                     setPassword('');
                   }}
                 >
-                  <p>{message}. Enter a password for {params.username}@{params.host}:</p>
+                  <p>{message}. Enter the password for {params.username}@{params.host}:</p>
                   <input type="password" autoFocus value={password} onChange={(e) => setPassword(e.target.value)} />
                   <div className="row">
                     <button className="primary">Connect</button>

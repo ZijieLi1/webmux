@@ -84,7 +84,7 @@ export default function Home({ onConnect }) {
             <div className="card" key={p.id}>
               <b>{p.name}</b>
               <span className="muted">{target(p)}</span>
-              <span className="muted small">{p.keyPath || 'default key / agent'}</span>
+              <span className="muted small">{p.authMethod === 'password' ? 'password auth' : p.keyPath || 'default key / agent'}</span>
               <div className="row">
                 <button className="primary" onClick={() => onConnect(p)}>Connect</button>
                 <button onClick={() => setForm({ mode: 'preset', title: 'Edit preset', initial: p })}>Edit</button>

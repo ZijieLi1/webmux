@@ -24,7 +24,11 @@ function readKey(keyPath) {
   }
 }
 
-function authConfig({ keyPath, password, passphrase }) {
+function authConfig({ authMethod, keyPath, password, passphrase }) {
+  if (authMethod === 'password') {
+    if (!password) throw new Error('Password required');
+    return { password, tryKeyboard: true };
+  }
   if (keyPath) return { privateKey: readKey(keyPath), passphrase: passphrase || undefined };
   const cfg = {};
   if (password) cfg.password = password;
@@ -69,6 +73,8 @@ class Session {
           this.close(e.message);
         })
         .on('close', () => this.close('Connection closed'))
+        // Many servers only offer "keyboard-interactive" for password logins.
+        .on('keyboard-interactive', (name, instructions, lang, prompts, finish) => finish(prompts.map(() => opts.password || '')))
         .connect({
           host,
           port,

@@ -37,6 +37,7 @@ function cleanPreset(p = {}) {
     port: port > 0 && port < 65536 ? port : 22,
     username: str(p.username, 100).trim(),
     keyPath: str(p.keyPath, 1024).trim(),
+    authMethod: p.authMethod === 'password' ? 'password' : 'key',
   };
 }
 
