@@ -5,7 +5,7 @@ const os = require('os');
 const net = require('net');
 const path = require('path');
 const crypto = require('crypto');
-const { Client } = require('ssh2');
+const { Client, utils } = require('ssh2');
 const store = require('./store');
 const tmux = require('./tmux');
 
@@ -24,19 +24,42 @@ function readKey(keyPath) {
   }
 }
 
+// Errors the UI can answer by prompting: `needs` is 'password' or 'passphrase'.
+const needs = (kind, message) => Object.assign(new Error(message), { needs: kind });
+
+// Returns { privateKey, passphrase } if the key is usable, or throws needs('passphrase').
+function loadKey(keyPath, passphrase) {
+  const privateKey = readKey(keyPath);
+  const parsed = utils.parseKey(privateKey, passphrase || undefined);
+  const err = Array.isArray(parsed) ? parsed.find((k) => k instanceof Error) : parsed instanceof Error ? parsed : null;
+  if (err) {
+    if (/passphrase|encrypted/i.test(err.message)) {
+      throw needs('passphrase', passphrase ? `Wrong passphrase for ${keyPath}` : `The SSH key ${keyPath} is protected by a passphrase`);
+    }
+    throw new Error(`Cannot use SSH key ${keyPath}: ${err.message}`);
+  }
+  return { privateKey, passphrase: passphrase || undefined };
+}
+
 function authConfig({ authMethod, keyPath, password, passphrase }) {
   if (authMethod === 'password') {
-    if (!password) throw new Error('Password required');
+    if (!password) throw needs('password', 'Password required');
     return { password, tryKeyboard: true };
   }
-  if (keyPath) return { privateKey: readKey(keyPath), passphrase: passphrase || undefined };
+  if (keyPath) return loadKey(keyPath, passphrase);
+  // No key path given: use the agent and/or the first default key.
   const cfg = {};
-  if (password) cfg.password = password;
-  else {
-    const key = DEFAULT_KEYS.find((p) => fs.existsSync(p));
-    if (key) cfg.privateKey = fs.readFileSync(key);
-    if (process.env.SSH_AUTH_SOCK) cfg.agent = process.env.SSH_AUTH_SOCK;
+  if (process.env.SSH_AUTH_SOCK) cfg.agent = process.env.SSH_AUTH_SOCK;
+  const defaultKey = DEFAULT_KEYS.find((p) => fs.existsSync(p));
+  if (defaultKey) {
+    try {
+      Object.assign(cfg, loadKey(defaultKey, passphrase));
+    } catch (e) {
+      // An agent can still authenticate without a passphrase-protected key.
+      if (!(e.needs && cfg.agent)) throw e;
+    }
   }
+  if (!cfg.agent && !cfg.privateKey) throw needs('password', 'No usable SSH key or agent found');
   return cfg;
 }
 

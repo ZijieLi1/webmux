@@ -135,7 +135,7 @@ function attachSockets(httpServer) {
           session.close(e.message);
         }
         const authFailed = /authentication methods failed/i.test(e.message);
-        ack?.({ ok: false, error: authFailed ? 'Authentication failed' : e.message, authFailed });
+        ack?.({ ok: false, error: authFailed ? 'Authentication failed' : e.message, authFailed, needs: e.needs });
       }
     });
 

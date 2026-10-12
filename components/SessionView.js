@@ -21,7 +21,10 @@ export default function SessionView({ params, active, onEnded }) {
   const [sid, setSid] = useState(null);
   const [status, setStatus] = useState('connecting'); // connecting | ready | detached | auth | closed
   const [message, setMessage] = useState('');
-  const [password, setPassword] = useState('');
+  const [secret, setSecret] = useState('');
+  const [prompt, setPrompt] = useState('password'); // what the auth overlay asks for: 'password' | 'passphrase'
+  // Credentials typed during this tab's lifetime, so Reconnect doesn't ask again. Never persisted.
+  const credsRef = useRef({});
   const [tab, setTab] = useState('files');
   const [sessions, setSessions] = useState([]);
   const [layout, setLayout] = useState(null);
@@ -30,8 +33,10 @@ export default function SessionView({ params, active, onEnded }) {
 
   const connect = useCallback(
     async (extra = {}) => {
-      const merged = { ...params, ...extra };
+      Object.assign(credsRef.current, extra);
+      const merged = { ...params, ...credsRef.current };
       if (merged.authMethod === 'password' && !merged.password) {
+        setPrompt('password');
         setStatus('auth');
         setMessage('Password required');
         return;
@@ -45,7 +50,9 @@ export default function SessionView({ params, active, onEnded }) {
           setSid(res.sid);
           setStatus('ready');
           termRef.current.focus();
-        } else if (res.authFailed) {
+        } else if (res.authFailed || res.needs) {
+          delete credsRef.current[res.needs === 'passphrase' ? 'passphrase' : 'password'];
+          setPrompt(res.needs === 'passphrase' ? 'passphrase' : 'password');
           setStatus('auth');
           setMessage(res.error);
         } else {
@@ -157,14 +164,19 @@ export default function SessionView({ params, active, onEnded }) {
                   className="stack"
                   onSubmit={(e) => {
                     e.preventDefault();
-                    connect({ authMethod: 'password', password });
-                    setPassword('');
+                    connect(prompt === 'passphrase' ? { passphrase: secret } : { authMethod: 'password', password: secret });
+                    setSecret('');
                   }}
                 >
-                  <p>{message}. Enter the password for {params.username}@{params.host}:</p>
-                  <input type="password" autoFocus value={password} onChange={(e) => setPassword(e.target.value)} />
+                  <p>
+                    {message}. Enter the {prompt === 'passphrase' ? 'key passphrase' : `password for ${params.username}@${params.host}`}:
+                  </p>
+                  <input type="password" autoFocus value={secret} onChange={(e) => setSecret(e.target.value)} />
                   <div className="row">
                     <button className="primary">Connect</button>
+                    {prompt === 'passphrase' && (
+                      <button type="button" onClick={() => { setSecret(''); setPrompt('password'); setMessage('Using password login'); }}>Use password instead</button>
+                    )}
                     <button type="button" onClick={onEnded}>Cancel</button>
                   </div>
                 </form>

@@ -46,7 +46,7 @@ WebMux gives whoever can reach it a shell on every device its server can reach. 
 It therefore binds to loopback by default; if you set `HOST` to anything else, put it behind an authenticating
 reverse proxy or VPN.
 
-- Auth is chosen per connection/preset: **SSH key** (key file path read server-side; blank uses default `~/.ssh` keys / `SSH_AUTH_SOCK`) or **Password** (also works with servers that only offer keyboard-interactive). Presets remember the method but never the password: it is asked for on each connect and held in memory only.
+- Auth is chosen per connection/preset: **SSH key** (key file path read server-side; blank uses default `~/.ssh` keys / `SSH_AUTH_SOCK`) or **Password** (also works with servers that only offer keyboard-interactive). Presets remember the method but never the password: it is asked for on each connect and held in memory only. Encrypted keys are supported too: WebMux asks for the passphrase (also never stored) and offers "Use password instead". Credentials typed in a tab are kept in memory for that tab, so Reconnect doesn't ask twice.
 - Host keys are pinned on first use; a changed key aborts the connection.
 - Cross-origin HTTP and WebSocket requests are rejected.
 - Port forwards listen on the *server's* loopback, not the browser machine's.
