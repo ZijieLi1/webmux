@@ -217,7 +217,16 @@ class Session {
     const name = await this.currentTmuxSession();
     const r = await this.exec(`tmux list-panes -t ${tmux.shQuote(`${name}:`)} -F ${tmux.shQuote(tmux.PANE_FMT)}`);
     if (r.code !== 0) throw new Error(r.err.trim() || 'tmux list-panes failed');
-    return { session: name, ...tmux.parsePanes(r.out) };
+    const m = await this.exec(`tmux display-message -p -t ${tmux.shQuote(`${name}:`)} '#{mouse}'`);
+    return { session: name, mouse: m.out.trim() === '1', ...tmux.parsePanes(r.out) };
+  }
+
+  // tmux mouse mode makes the wheel scroll tmux's own history (copy-mode) and
+  // lets clicks select panes. Applied to the current session only.
+  async setMouse(on) {
+    const name = await this.currentTmuxSession();
+    const r = await this.exec(`tmux set-option -t ${tmux.shQuote(`${name}:`)} mouse ${on ? 'on' : 'off'}`);
+    if (r.code !== 0) throw new Error(r.err.trim() || 'set-option failed');
   }
 
   async selectPane(paneId) {

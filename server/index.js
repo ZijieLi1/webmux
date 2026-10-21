@@ -145,6 +145,7 @@ function attachSockets(httpServer) {
     handle('tmux:sessions', (s) => s.listTmuxSessions());
     handle('tmux:panes', (s) => s.listPanes());
     handle('tmux:select-pane', (s, p) => s.selectPane(p.paneId));
+    handle('tmux:mouse', (s, p) => s.setMouse(!!p.on));
     handle('tmux:sync', (s, p) => s.setSync(!!p.on));
     handle('sftp:list', (s, p) => s.listDir(p.path));
     handle('fwd:list', (s) => s.listForwards());

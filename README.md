@@ -32,6 +32,7 @@ Requirements: Node 20+, `nmap` on the server (only for the scanner), `tmux` on t
 - **Network scanner** — *Scan Subnet* (defaults to the server's own subnet), then save a host as a preset or SSH straight in.
 - **tmux toolbar** — new session, list/attach, detach, split `|`/`—`, close pane, next/previous window.
 - **Files** — SFTP browser, drag-and-drop upload into the current directory, right-click → download (streamed).
+- **Mouse** — toggles tmux mouse mode for the current session: the wheel scrolls tmux's history and clicks focus panes. Hold Shift while dragging to select text for copying.
 - **Sync input** — toggles tmux `synchronize-panes` for the current window.
 - **Layout** — minimap built from `tmux list-panes`; click a pane to focus it.
 - **Ports** — forward a remote port to a local one through the SSH connection; start/stop per forward.

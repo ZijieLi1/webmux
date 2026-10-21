@@ -2,7 +2,7 @@
 import { useState } from 'react';
 
 // Sticky toolbar mapping tmux actions to buttons. `run(action, arg)` performs them.
-export default function TmuxToolbar({ run, sessions, refreshSessions, synced, onSync, disabled }) {
+export default function TmuxToolbar({ run, sessions, refreshSessions, synced, onSync, mouse, onMouse, disabled }) {
   const [open, setOpen] = useState(null); // 'new' | 'list' | null
   const [name, setName] = useState('');
 
@@ -67,6 +67,10 @@ export default function TmuxToolbar({ run, sessions, refreshSessions, synced, on
         {btn('◀ Prev', 'Previous window (p)', () => run('previous-window'))}
         {btn('Next ▶', 'Next window (n)', () => run('next-window'))}
       </div>
+      <label className="switch first" title="tmux mouse mode: wheel scrolls tmux history, click focuses panes. Hold Shift to select text for copying.">
+        <input type="checkbox" checked={mouse} onChange={(e) => onMouse(e.target.checked)} disabled={disabled} />
+        <span>Mouse</span>
+      </label>
       <label className="switch" title="Broadcast keystrokes to every pane in the window (synchronize-panes)">
         <input type="checkbox" checked={synced} onChange={(e) => onSync(e.target.checked)} disabled={disabled} />
         <span>Sync input</span>

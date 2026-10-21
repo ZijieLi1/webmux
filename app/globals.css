@@ -50,7 +50,8 @@ td.actions { text-align: right; white-space: nowrap; }
 .session { height: 100%; flex-direction: column; }
 .toolbar { position: sticky; top: 0; z-index: 10; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; padding: 6px 10px; background: var(--panel); border-bottom: 1px solid var(--border); }
 .tb-group { display: flex; gap: 4px; }
-.switch { display: flex; flex-direction: row; align-items: center; gap: 6px; margin-left: auto; color: var(--fg); font-size: 13px; }
+.switch.first { margin-left: auto; }
+.switch { display: flex; flex-direction: row; align-items: center; gap: 6px; color: var(--fg); font-size: 13px; }
 .switch input { width: auto; }
 .pop-wrap { position: relative; }
 .popover { position: absolute; top: 110%; left: 0; z-index: 20; background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 8px; display: flex; gap: 6px; min-width: 260px; box-shadow: 0 6px 20px #0008; }
@@ -90,3 +91,10 @@ ul { list-style: none; padding: 0; margin: 0; }
   .session-main { flex-direction: column; }
   .side { width: 100%; height: 40%; border-left: 0; border-top: 1px solid var(--border); }
 }
+
+/* Dragging a selection in the terminal must never highlight the surrounding UI. */
+.topbar, .toolbar, .side, .term-wrap, .overlay, .notice { user-select: none; -webkit-user-select: none; }
+.side input, .side textarea, .overlay input, .modal input, .modal textarea { user-select: text; -webkit-user-select: text; }
+.xterm, .terminal-host { min-width: 0; overscroll-behavior: contain; }
+.term-wrap { overflow: hidden; }
+.side, .panel-body { overscroll-behavior: contain; }

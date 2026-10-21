@@ -125,6 +125,15 @@ export default function SessionView({ params, active, onEnded }) {
     }
   };
 
+  const setMouse = async (on) => {
+    try {
+      await call('tmux:mouse', { sid, on });
+      refreshLayout();
+    } catch (e) {
+      flash(e.message);
+    }
+  };
+
   const selectPane = async (paneId) => {
     try {
       await call('tmux:select-pane', { sid, paneId });
@@ -150,6 +159,8 @@ export default function SessionView({ params, active, onEnded }) {
         refreshSessions={refreshSessions}
         synced={!!layout?.synced}
         onSync={setSync}
+        mouse={!!layout?.mouse}
+        onMouse={setMouse}
         disabled={!ready}
       />
       {notice && <div className="notice">{notice}</div>}
